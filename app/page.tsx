@@ -1,6 +1,6 @@
 "use client"
-
-import { useState } from "react"
+import { useEffect, useState } from "react"
+import { getRenderStatus } from "@/services/renderStatusService"
 import EditorShell from "@/components/editor/layout/EditorShell"
 
 export default function EditorPage() {
@@ -72,6 +72,48 @@ export default function EditorPage() {
       setYoutubeUploading(false)
     }
   }
+
+  useEffect(() => {
+
+    if (!loading) return
+
+    const interval = setInterval(async () => {
+
+      try {
+
+        const status = await getRenderStatus()
+
+        setRenderStage(status.stage || "Rendering")
+        setRenderProgress(status.progress || 0)
+
+        if (status.error) {
+          setRenderError(status.error)
+        }
+
+        if (status.complete) {
+
+          setLoading(false)
+
+          if (status.download_url) {
+            setDownloadUrl(status.download_url)
+          }
+
+          if (status.output_filename) {
+            setOutputFilename(status.output_filename)
+          }
+
+          clearInterval(interval)
+        }
+
+      } catch (err) {
+        console.error(err)
+      }
+
+    }, 1000)
+
+    return () => clearInterval(interval)
+
+  }, [loading])
 
   return (
     <EditorShell
