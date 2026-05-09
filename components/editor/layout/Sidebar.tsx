@@ -145,9 +145,9 @@ export default function Sidebar({
   ])
 
   async function handleRender() {
-    try {
-      setLoading(false)
+    if (loading) return; // guard against duplicate calls
 
+    try {
       if (!levelName || !runTime) {
         alert("Level name and runtime required")
         return
@@ -164,11 +164,10 @@ export default function Sidebar({
       }
 
       setLoading(true)
+      setRenderError(null)  // clear any previous error
       setYoutubeUrl("")
       setDownloadUrl("")
       setOutputFilename("")
-
-
 
       await renderVideo(
         clip1,
@@ -180,11 +179,8 @@ export default function Sidebar({
       )
 
     } catch (error) {
-
       console.error(error)
-
       setLoading(false)
-
       alert("Render failed")
     }
   }
