@@ -178,10 +178,12 @@ export default function Sidebar({
         `${levelName}_${runTime}`
       )
 
-    } catch (error) {
-      console.error(error)
-      setLoading(false)
-      alert("Render failed")
+    } catch (error: any) {
+      console.error("FULL ERROR:", error)
+      alert(
+        error?.message ||
+        "Unknown render error"
+      )
     }
   }
 
